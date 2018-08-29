@@ -20,12 +20,14 @@ using namespace std;
 /**
  *	@param directory/file 
  *	@return type and permission on the 'dir' passed to the function 
- * **/
+ * */
 string find_file_type_permission(char *dir){
 
 	struct stat pst;
 
-	if(lstat(dir,&pst)<0){
+	//stat(dir,&pst);
+
+	if(stat(dir,&pst)<0){
 		cerr<<"FATAL:  Could not determine file permissions.";
 		exit(1);
 	}
@@ -47,8 +49,8 @@ string find_file_type_permission(char *dir){
 string find_type(int mode){
 	
 	string s="-";	
-	
-	if ((mode &  0170000) == 0010000)
+	s[0] = mode & S_IFDIR ? 'd':'-';
+	/*if ((mode &  0170000) == 0010000)
                 //named pipe
                 s[0]='p';
         else if ((mode &  0170000) == 0020000)
@@ -71,7 +73,7 @@ string find_type(int mode){
                 s[0]='s';
         else
                 //unknown file
-                s[0]='?';
+                s[0]='?';*/
 	return s;
 }
 
@@ -105,12 +107,12 @@ string find_permission(int mode){
    	if((mode & 0000001) == 0000001) 
 		s[8] = 'x';
 	//special  permissions
-   	if((mode & 0004000) == 0004000) 
-		s[2] = 's';
-   	if((mode & 0002000) == 0002000) 
-		s[4] = 's';
-   	if((mode & 0001000) == 0001000) 
-		s[8] = 't';
+   //	if((mode & 0004000) == 0004000) 
+	//	s[2] = 's';
+   	//if((mode & 0002000) == 0002000) 
+	//	s[4] = 's';
+   	//if((mode & 0001000) == 0001000) 
+	//	s[8] = 't';
 	
 	return s;
 }

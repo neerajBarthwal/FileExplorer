@@ -4,9 +4,9 @@ using namespace std;
 
 string find_file_mod_time(char *dir){
 	struct stat pst;
-
-        if(lstat(dir,&pst)<0){
-                cerr<<"FATAL:  Could not determine file permissions.";
+	
+        if(stat(dir,&pst)<0){
+                cerr<<"FATAL:  Could not determine file time.";
                 exit(1);
         }
 

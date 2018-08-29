@@ -16,12 +16,13 @@ using namespace std;
 float find_file_size(char *dir){
 	
 	 struct stat pst;
-
-        if(lstat(dir,&pst)<0){
-                cerr<<"FATAL:  Could not determine file permissions.";
+	 //stat(dir,&pst);
+        if(stat(dir,&pst)<0){
+        		perror("stat()");
+                cerr<<"FATAL:  Could not determine file size."<<dir;
                 exit(1);
         }
 
-        float size = pst.st_size/1024;
+        float size = pst.st_size/1024;  
 	return size;
 }

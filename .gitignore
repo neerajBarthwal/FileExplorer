@@ -1,2 +1,4 @@
 #ignore all test files
 test*
+/test
+.fexplorer.cpp.swp

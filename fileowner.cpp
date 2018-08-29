@@ -8,15 +8,15 @@ string convert_gid_toname(int);
 string find_ownership(char *dir){
 
 	struct stat pst;
-
-        if(lstat(dir,&pst)<0){
+	
+        if(stat(dir,&pst)<0){
                 cerr<<"FATAL:  Could not determine file permissions.";
                 exit(1);
         }
 
 	int uid = pst.st_uid;
 	int gid = pst.st_gid;
-
+	
 	string user_name = convert_uid_toname(uid);
 	string group_name = convert_gid_toname(gid);
 	
@@ -41,6 +41,7 @@ string convert_gid_toname(int gid){
 
         struct group * grp = getgrgid(gid);
         if(grp==NULL){
+        	
                 cerr<<"Could not fetch owner details: gid";
                 return "";
         }else{
