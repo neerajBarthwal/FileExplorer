@@ -34,9 +34,9 @@ std::string find_ownership(char *dir);
 std::string conver_uid_toname(int);
 std::string convert_gid_toname(int);
 std::string find_file_mod_time(char *dir);
-
 std::string trim_to_parent(std::string);
 std::string trim_to_home(std::string);
+struct fileattr create_home_dir_node(std::string);
 
 #endif
 

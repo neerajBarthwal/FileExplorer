@@ -45,6 +45,9 @@ void clean_up_traversal(int);
 void do_move_forward();
 void do_move_backward();
 void populate_traversal();
+void open_file_with_default();
+void goto_home();
+
 struct termios initial_settings, new_settings;
 struct winsize win;
 FILE *input, *output;
@@ -66,6 +69,7 @@ int main(int argc, char *argv[]){
                 	HOME=cwd;
                 	struct fileattr homedir = fs_hierarchy[0];
                 	homedir.f_path = trim_to_home(homedir.f_path);
+                	homedir.f_type[0]='d';
                 	fs_traversal.push_back(homedir);
        		 }else{
 		 	cout<<"Error. Could not open PWD"<<"\n";
@@ -158,12 +162,45 @@ int main(int argc, char *argv[]){
 			do_enter();	
 		}else if((int)ch == 127){
 			do_one_level_up();
+		}else if(ch=='h' || ch=='H'){
+			goto_home();
 		}
 
         }while(ch!='q');
 
 	exit_file_explorer();
 }
+
+void goto_home(){
+
+		if(traversal_pointer==1){
+			traversal_pointer--;
+		}else if(traversal_pointer>=2){
+			//cout<<"Traversal Pointer before erase: "<<traversal_pointer;
+			//int x;cin>>x;
+			fs_traversal.erase(fs_traversal.begin()+1, fs_traversal.begin()+traversal_pointer);
+			traversal_pointer=1;
+			auto it = fs_traversal.begin()+traversal_pointer+1;
+
+			if(it!=fs_traversal.end()){
+				fs_traversal.erase(fs_traversal.begin()+1, fs_traversal.end());	
+			}
+
+			traversal_pointer =0;
+		}
+
+		string path = HOME;
+		char ab_path[PATH_MAX];
+		strcpy(ab_path, path.c_str());
+		cout<<"\033[2J";
+		gotoxy(0,0);
+		reset_scroll_param();
+		fs_hierarchy.clear();
+		initialize_file_system_hierarchy(ab_path);
+}
+
+
+
 
 void do_move_forward(){
 	auto it = fs_traversal.begin()+(traversal_pointer+1);
@@ -174,6 +211,7 @@ void do_move_forward(){
 		strcpy(ab_path, path.c_str());
 		cout<<"\033[2J";
 		gotoxy(0,0);
+		reset_scroll_param();
 		fs_hierarchy.clear();
 		initialize_file_system_hierarchy(ab_path);
 
@@ -195,6 +233,7 @@ void do_move_backward(){
 			strcpy(ab_path, path.c_str());
 			cout<<"\033[2J";
 			gotoxy(0,0);
+			reset_scroll_param();
 			fs_hierarchy.clear();
 			initialize_file_system_hierarchy(ab_path);
 
@@ -209,10 +248,6 @@ void do_enter(){
 	char ab_path[PATH_MAX];
 	string fpath = fs_hierarchy[record_pointer].f_path;
 	strcpy(ab_path, fpath.c_str());
-	//reset_scroll_param();
-	//cout<<"\033[2J";
-	//gotoxy(0,0);
-	//fs_hierarchy.clear();
 	do_open(ab_path);
 
 }
@@ -228,17 +263,15 @@ void populate_traversal(){
 		}
 		
 	}else{
-		//push to traversal tree
-		fs_traversal.push_back(fs_hierarchy[record_pointer]);
-		traversal_pointer++;
-		//cout<<"B traversal size: "<<fs_traversal.size()<<" file inserted: "<<fs_traversal[traversal_pointer].f_name;
-		//int x;cin>>x;
-		//perform clean up
-		clean_up_traversal(traversal_pointer+1);
-		//cout<<"A traversal size: "<<fs_traversal.size()<<" file inserted: "<<fs_traversal[traversal_pointer].f_name;
-
-		//cout<<"A traversal size: "<<fs_traversal.size();
-		//int y;cin>>y;
+		// push only directrories to the traversal tree
+		if(fs_hierarchy[record_pointer].f_type[0]=='d'){
+			//push to traversal tree
+			fs_traversal.push_back(fs_hierarchy[record_pointer]);
+			traversal_pointer++;
+			//perform clean up
+			clean_up_traversal(traversal_pointer+1);
+		}
+		
 	}
 	
 }
@@ -283,14 +316,29 @@ void do_open(char absolute_path[]){
 				gotoxy(0,0);
 				initialize_file_system_hierarchy(absolute_path);
 				return;
+			}else if(type[0]=='-'){
+				open_file_with_default();
 			}		
 	}
 
 }
 
+
+void open_file_with_default(){
+	string path = fs_hierarchy[record_pointer].f_path;
+	
+	int pid = fork();
+	if(pid==0){
+		execl("/usr/bin/xdg-open", "xdg-open",path.c_str(), (char *)NULL);
+		exit(1);
+	}	
+
+}
+
 void do_one_level_up(){
 
-	traversal_pointer--;
+	if(traversal_pointer>0)
+		traversal_pointer--;
 	clean_up_traversal(traversal_pointer+1);
 	
 	string path = fs_hierarchy[record_pointer].f_path;
@@ -305,6 +353,7 @@ void do_one_level_up(){
 		char parent[PATH_MAX];
 		strcpy(parent,path.c_str());
 		cout<<"\033[2J";
+		reset_scroll_param();
 		fs_hierarchy.clear();
 		gotoxy(0,0);
 		initialize_file_system_hierarchy(parent);
