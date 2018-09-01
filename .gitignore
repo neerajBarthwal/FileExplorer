@@ -2,3 +2,5 @@
 test*
 /test
 .fexplorer.cpp.swp
+*.o
+log.txt

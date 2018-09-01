@@ -18,7 +18,7 @@ float find_file_size(char *dir){
 	 struct stat pst;
 	 //stat(dir,&pst);
         if(stat(dir,&pst)<0){
-        		perror("stat()");
+        	perror("stat()");
                 cerr<<"FATAL:  Could not determine file size."<<dir;
                 exit(1);
         }

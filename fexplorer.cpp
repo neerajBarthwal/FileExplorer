@@ -47,17 +47,21 @@ void do_move_backward();
 void populate_traversal();
 void open_file_with_default();
 void goto_home();
+void initialize_cmd_mode();
 
 struct termios initial_settings, new_settings;
 struct winsize win;
 FILE *input, *output;
-bool scrolling = false;
+bool scrolling = false,cmd=false;
 unsigned int pos_up=1, pos_down=1,bottom_of_screen,record_pointer=0, traversal_pointer=0;
 vector<struct fileattr> fs_hierarchy;
 vector<struct fileattr> fs_traversal;
 
 string HOME;
+string CWD;
 int main(int argc, char *argv[]){
+
+	freopen("log.txt","w",stderr);
 	
 	char cwd[PATH_MAX];
 	initialize_file_explorer_tty();
@@ -83,10 +87,9 @@ int main(int argc, char *argv[]){
 
 	char ch;
         do{
-                ch=getchar();
+            ch=getchar();
 		
 		if (ch == '\033') { // if the first value is esc
-
    			 cin>>ch; // skip the [
 			 cin>>ch;
     			 switch(ch) { // the real value
@@ -164,20 +167,30 @@ int main(int argc, char *argv[]){
 			do_one_level_up();
 		}else if(ch=='h' || ch=='H'){
 			goto_home();
+		}else if(ch==':'){
+			cout<<"\0337";
+			cout<<"\033[2K";
+			switch_to_cmd_mode();
+			cout<<"\033[2K";
+			cout<<"\0338";
+
 		}
+
 
         }while(ch!='q');
 
 	exit_file_explorer();
 }
 
+
+
+
 void goto_home(){
 
 		if(traversal_pointer==1){
 			traversal_pointer--;
 		}else if(traversal_pointer>=2){
-			//cout<<"Traversal Pointer before erase: "<<traversal_pointer;
-			//int x;cin>>x;
+			
 			fs_traversal.erase(fs_traversal.begin()+1, fs_traversal.begin()+traversal_pointer);
 			traversal_pointer=1;
 			auto it = fs_traversal.begin()+traversal_pointer+1;
@@ -413,6 +426,7 @@ void initialize_file_system_hierarchy(char *dir){
 	DIR *dp = opendir(dir);
 
 	string absolute(dir);
+	CWD = absolute;
 	absolute+="/";
 	if(dp==NULL){
 		cerr<<"Cannot open directory: "<<dir;
@@ -460,7 +474,6 @@ void do_listing(){
 void print_fs(unsigned int window_size, int offset){
 	
 	unsigned int i;
-	//cout<<"OFFSET: "<<offset<<"\n";
 	for(i=offset; i<(window_size+offset)-1 && (i<fs_hierarchy.size()) ;i++){
 	
 
@@ -478,7 +491,7 @@ void print_fs(unsigned int window_size, int offset){
 	
 	bottom_of_screen = i;
 	
-cout<<"\033[7m --Awesome File Explorer-- \033[m"<<" Bottom of screen: "<<bottom_of_screen<<" pos_down: "<<pos_down<<" pos_up: "<<pos_up<<" rp: "<<record_pointer;
+cout<<"\033[7m --Awesome File Explorer-- \033[m";
 }
 
 string trim_to_parent(string parent){
