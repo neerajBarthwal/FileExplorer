@@ -15,11 +15,11 @@ void do_snap(string source){
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
                 continue;
             string absolute_path = source+"/"+entry->d_name;
-            snapfile<<absolute_path;
+            snapfile<<absolute_path<<"\n";
             do_snap(absolute_path);
         } else {
         	string absolute_path = source+"/"+entry->d_name;
-            snapfile<<absolute_path;
+            snapfile<<absolute_path<<"\n";
         }
     }
     closedir(dir);

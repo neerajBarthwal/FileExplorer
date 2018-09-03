@@ -150,7 +150,7 @@ void parse_cmd(string cmd){
 			
 			
 		}else if(cmdtoken[0]=="snapshot"){
-			cerr<<"\n calling snapshot...";
+
 			snapshot(cmdtoken[1],cmdtoken[2]);
 		}
 
