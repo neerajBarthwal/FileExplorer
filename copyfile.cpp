@@ -1,3 +1,5 @@
+//Roll Number: 2018201069
+//Name       : Neeraj Barthwal
 #include "filetypeperm.h"
 #define debug(x) cout<<#x<<"="<<x<<endl;
 #define correct(x, y, n, m) (0 <= (x) && (x) < (n) && 0 <= (y) && (y) < (m))
@@ -37,8 +39,6 @@ int copy_files_to_dir(string source, string destination){
 	ssize_t count;
 	int destf = open(destination.c_str(), O_WRONLY | O_CREAT | S_IRUSR | S_IWUSR);
     if (destf == -1){
-    	cout<<"\n failed in dest";
-    	perror("Error: ");
         return -1;
     }
 
@@ -46,14 +46,12 @@ int copy_files_to_dir(string source, string destination){
 	mode_t org_mode;
 
 	if(stat((char *)(source.c_str()),&pst) != 0){
-     	cout<<"stat error!\n"; 
      	return -1;
      }
      org_mode = pst.st_mode;
      	
 	int sourcef = open(source.c_str(), O_RDONLY);
     if (sourcef == -1) {
-    	cout<<"\n Failed in source: ";
     	return -1;
     }
         	
@@ -67,12 +65,10 @@ int copy_files_to_dir(string source, string destination){
 
 
 void copy_dir_to_dir(string source_name, string source_path, string destination){
-    cerr<<"\nIn copy: "<<source_name<<" "<<source_path<<" "<<destination;
     
     DIR *dir;
     struct dirent *entry;
     struct stat fileinfo;
-    //debug3(source_name,source_path,destination);
     if (!(dir = opendir((char *)source_path.c_str())))
         return;
 
@@ -100,8 +96,3 @@ void copy_dir_to_dir(string source_name, string source_path, string destination)
     closedir(dir);
 }
 
-/*int main(){
-    freopen("log2.txt","w",stderr);
-    copy_dir_to_dir("a","/home/neeraj/project/OS/fileexplorer/code/a","/home/neeraj/project/OS/fileexplorer/code/b");
-    return 0;
-}*/
