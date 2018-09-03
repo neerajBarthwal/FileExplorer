@@ -1,23 +1,7 @@
-#include <vector>
-#include <string>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string>
-#include <iostream>
-#include <pwd.h>
-#include <grp.h>
-#include <time.h>
-#include <algorithm>
-#include <sstream>
-#include <sys/stat.h>
+#include "filetypeperm.h"
 using namespace std;
 
-
+/*string HOME="/home/neeraj/project/OS/fileexplorer/code";
 string convert_to_home(string dest){
 		//Assume file name: ~/filename
 		//Removing character ~ from destination
@@ -37,9 +21,18 @@ vector<string> split(const string& s, char delimiter)
       tokens.push_back(token);
    }
    return tokens;
+}*/
+
+int create_file(string abs_path){
+
+	int fd = open(abs_path.c_str(), O_RDWR|O_CREAT, 0777);
+	if (fd != -1) {
+    	close(fd);
+	}
+	return fd;
 }
 
-int main(){
+/*int main(){
 
 	string cmd;
 	getline(cin,cmd);
@@ -54,12 +47,5 @@ int main(){
 	}
 
 
-}
+}*/
 
-int create_file(string abs_path){
-
-	int fd = open(abs_path, O_RDWR|O_CREAT, 0777);
-	if (fd != -1) {
-    	close(fd2);
-	}
-}

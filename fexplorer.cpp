@@ -48,7 +48,7 @@ void populate_traversal();
 void open_file_with_default();
 void goto_home();
 void initialize_cmd_mode();
-
+string get_name_from_path(string);
 struct termios initial_settings, new_settings;
 struct winsize win;
 FILE *input, *output;
@@ -169,7 +169,6 @@ int main(int argc, char *argv[]){
 			goto_home();
 		}else if(ch==':'){
 			cout<<"\0337";
-			cout<<"\033[2K";
 			switch_to_cmd_mode();
 			cout<<"\033[2K";
 			cout<<"\0338";
@@ -181,9 +180,6 @@ int main(int argc, char *argv[]){
 
 	exit_file_explorer();
 }
-
-
-
 
 void goto_home(){
 
@@ -212,7 +208,13 @@ void goto_home(){
 		initialize_file_system_hierarchy(ab_path);
 }
 
-
+void display_search_result(){
+	cout<<"\033[2J";
+	gotoxy(0,0);
+	for(unsigned int i=0;i<fs_search.size();i++){
+		cout<<fs_search[i].f_name<<" "<<fs_search[i].f_path<<"\n";
+	}
+}
 
 
 void do_move_forward(){
@@ -334,6 +336,32 @@ void do_open(char absolute_path[]){
 			}		
 	}
 
+}
+
+void do_goto(string path){
+	if(path==CWD){
+		reset_scroll_param();
+		gotoxy(4,0);
+		return;
+	}
+	cerr<<"\nhere in goto";
+	cerr<<"\npath: "<<path;
+	struct fileattr node;
+	node.f_path=path;
+	node.f_name = get_name_from_path(path);
+	node.f_type[0]='d';
+	traversal_pointer++;
+	fs_traversal.push_back(node);
+
+	auto it = fs_traversal.begin()+traversal_pointer+1;
+	if(it!=fs_traversal.end())
+		clean_up_traversal(traversal_pointer+1);
+	reset_scroll_param();
+	cout<<"\033[2J";
+	fs_hierarchy.clear();
+	gotoxy(0,0);
+	cerr<<"\npath: "<<path;
+	initialize_file_system_hierarchy((char*)path.c_str());
 }
 
 
@@ -519,6 +547,16 @@ string trim_to_home(string path){
 	}
 	return path;
 	
+}
+
+string get_name_from_path(string path){
+	for(int i=path.size();i>=0;i--){
+		if(path[i]=='/'){
+			path = path.substr(i,path.size());
+			break;
+		}
+	}
+	return path;
 }
 
 /**

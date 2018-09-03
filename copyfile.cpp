@@ -1,4 +1,4 @@
-//#include "filetypeperm.h"
+#include "filetypeperm.h"
 #define debug(x) cout<<#x<<"="<<x<<endl;
 #define correct(x, y, n, m) (0 <= (x) && (x) < (n) && 0 <= (y) && (y) < (m))
 #define debug2(x,y) cout<<#x<<"="<<x<<" "<<#y<<"="<<y<<endl;
@@ -67,10 +67,12 @@ int copy_files_to_dir(string source, string destination){
 
 
 void copy_dir_to_dir(string source_name, string source_path, string destination){
+    cerr<<"\nIn copy: "<<source_name<<" "<<source_path<<" "<<destination;
+    
     DIR *dir;
     struct dirent *entry;
     struct stat fileinfo;
-    debug3(source_name,source_path,destination);
+    //debug3(source_name,source_path,destination);
     if (!(dir = opendir((char *)source_path.c_str())))
         return;
 
@@ -99,7 +101,7 @@ void copy_dir_to_dir(string source_name, string source_path, string destination)
 }
 
 /*int main(){
-
-    copy_dir_to_dir("copytest1","/home/neeraj/project/OS/fileexplorer/code/copytest1","/home/neeraj/project/OS/fileexplorer/code/copytest");
+    freopen("log2.txt","w",stderr);
+    copy_dir_to_dir("a","/home/neeraj/project/OS/fileexplorer/code/a","/home/neeraj/project/OS/fileexplorer/code/b");
     return 0;
 }*/
